@@ -274,6 +274,7 @@ public class Dino.Plugins.Rtp.CodecUtil {
     }
 
     public static string? get_decode_prefix(string media, string codec, string decode, JingleRtp.PayloadType? payload_type) {
+        if (decode == "vah264dec" || decode == "avdec_h264") return "h264parse ! ";
         return null;
     }
 
