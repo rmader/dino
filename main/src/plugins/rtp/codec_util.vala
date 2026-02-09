@@ -105,6 +105,7 @@ public class Dino.Plugins.Rtp.CodecUtil {
                         "vah264lpenc",
                         "vah264enc",
 #endif
+                        "openh264enc",
                         "x264enc"
                     };
                 case "vp9":
@@ -165,7 +166,7 @@ public class Dino.Plugins.Rtp.CodecUtil {
 #if ENABLE_V4L2SL
                         "v4l2slh264dec",
 #endif
-                        null
+                        "openh264dec"
                     };
                 case "vp9":
                     return new string[] {
@@ -213,6 +214,7 @@ public class Dino.Plugins.Rtp.CodecUtil {
     public static string? get_encode_args(string media, string codec, string encode, JingleRtp.PayloadType? payload_type) {
         // H264
         if (encode == "msdkh264enc" || encode == "vah264lpenc" || encode == "vah264enc") return @" rate-control=vbr";
+        if (encode == "openh264enc") return @" rate-control=bitrate";
         if (encode == "x264enc") return @" byte-stream=1 speed-preset=ultrafast tune=zerolatency bframes=0 cabac=false dct8x8=false";
 
         // VP8
@@ -260,6 +262,10 @@ public class Dino.Plugins.Rtp.CodecUtil {
             case "vavp8enc":
                 bitrate = uint.min(2048000, bitrate);
                 encode.set("bitrate", bitrate);
+                return bitrate;
+            case "openh264enc":
+                bitrate = uint.min(2048000, bitrate);
+                encode.set("bitrate", bitrate * 1024);
                 return bitrate;
             case "vp9enc":
             case "vp8enc":
