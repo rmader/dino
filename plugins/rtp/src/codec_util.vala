@@ -104,6 +104,7 @@ public class Dino.Plugins.Rtp.CodecUtil {
 #if ENABLE_VAAPI
                         "vaapih264enc",
 #endif
+                        "openh264enc",
                         "x264enc"
                     };
                 case "vp9":
@@ -193,6 +194,7 @@ public class Dino.Plugins.Rtp.CodecUtil {
         // H264
         if (encode == "msdkh264enc") return @" rate-control=vbr";
         if (encode == "vaapih264enc") return @" rate-control=vbr";
+        if (encode == "openh264enc") return @" rate-control=bitrate";
         if (encode == "x264enc") return @" byte-stream=1 speed-preset=ultrafast tune=zerolatency bframes=0 cabac=false dct8x8=false";
 
         // VP8
@@ -237,6 +239,10 @@ public class Dino.Plugins.Rtp.CodecUtil {
             case "vaapivp8enc":
                 bitrate = uint.min(2048000, bitrate);
                 encode.set("bitrate", bitrate);
+                return bitrate;
+            case "openh264enc":
+                bitrate = uint.min(2048000, bitrate);
+                encode.set("bitrate", bitrate * 1024);
                 return bitrate;
             case "vp9enc":
             case "vp8enc":
