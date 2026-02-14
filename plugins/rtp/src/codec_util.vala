@@ -348,8 +348,8 @@ public class Dino.Plugins.Rtp.CodecUtil {
         string decode_args = get_decode_args(media, codec, decode, payload_type) ?? "";
         string decode_suffix = get_decode_suffix(media, codec, decode, payload_type) ?? "";
         string depay_args = get_depay_args(media, codec, decode, payload_type) ?? "";
-        string resample = media == "audio" ? @" ! audioresample name=$(base_name)_resample" : "";
-        return @"queue ! $depay$depay_args name=$(base_name)_rtp_depay ! $decode_prefix$decode$decode_args name=$(base_name)_$(codec)_decode$decode_suffix ! $(media)convert name=$(base_name)_convert$resample";
+        string convert_suffix = media == "audio" ?  @" ! audioconvert name=$(base_name)_convert ! audioresample name=$(base_name)_resample" : "";
+        return @"queue ! $depay$depay_args name=$(base_name)_rtp_depay ! $decode_prefix$decode$decode_args name=$(base_name)_$(codec)_decode$decode_suffix$(convert_suffix)";
     }
 
     public Gst.Element? get_decode_bin(string media, JingleRtp.PayloadType payload_type, string? name = null) {
