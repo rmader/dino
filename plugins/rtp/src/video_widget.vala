@@ -284,8 +284,8 @@ public class Dino.Plugins.Rtp.VideoWidget : Gtk.Widget, Dino.Plugins.VideoCallWi
         plugin.pause();
         pipe.add(sink);
         if (is_gtk4paintablesink) {
+            sink.get_static_pad("sink").notify["caps"].connect(input_caps_changed);
             prepare = Gst.parse_bin_from_description(@"videoflip video-direction=auto name=video_widget_$(id)_orientation", true);
-            prepare.get_static_pad("src").notify["caps"].connect(input_caps_changed);
             Gdk.Paintable paintable = widget.get_paintable();
             paintable.set("orientation", 5 /* FlipRotate0 */);
         } else {
