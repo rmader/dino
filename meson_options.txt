@@ -16,3 +16,5 @@ option('plugin-rtp-vp9', type: 'feature', value: 'disabled', description: 'VP9 c
 option('plugin-rtp-v4l2', type: 'feature', value: 'disabled', description: 'V4L2 API (stateful)')
 option('plugin-rtp-v4l2-sl', type: 'feature', value: 'disabled', description: 'V4L2 API (stateless)')
 option('plugin-rtp-webrtc-audio-processing', value: 'auto', type: 'feature', description: 'Voice preprocessing')
+
+option('libportal', type: 'feature', value: 'auto', description: 'Autostart and running in background support')
