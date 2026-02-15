@@ -39,5 +39,33 @@
         </child>
       </object>
     </child>
+    <child>
+      <object class="AdwPreferencesGroup">
+        <property name="title" translatable="yes">Desktop environment intregration</property>
+        <child>
+          <object class="AdwSwitchRow" id="run_in_background_row">
+            <property name="title" translatable="yes">_Run in background</property>
+            <property name="use-underline">True</property>
+          </object>
+        </child>
+        <child>
+          <object class="AdwSwitchRow" id="autostart_row">
+            <property name="title" translatable="yes">_Autostart</property>
+            <property name="use-underline">True</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton" id="request_background_portal_button">
+            <property name="label" translatable="yes">_Request</property>
+            <property name="use-underline">True</property>
+            <property name="halign">center</property>
+            <style>
+              <class name="pill" />
+              <class name="suggested-action" />
+            </style>
+          </object>
+        </child>
+      </object>
+    </child>
   </template>
 </interface>
