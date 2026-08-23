@@ -105,7 +105,7 @@ public class Dino.Plugins.Rtp.CodecUtil {
                         "vah264lpenc",
                         "vah264enc",
 #endif
-                        "openh264enc"
+                        null
                     };
                 case "vp9":
                     return new string[] {
