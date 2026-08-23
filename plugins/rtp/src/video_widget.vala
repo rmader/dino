@@ -166,6 +166,7 @@ public class Dino.Plugins.Rtp.VideoWidget : Gtk.Widget, Dino.Plugins.VideoCallWi
     private Gst.Video.Sink sink;
     private Gtk.Picture widget;
     private bool is_gtk4paintablesink;
+    private bool got_first_buffer;
     private bool flipped;
 
     private static uint active_widgets = 0;
@@ -221,6 +222,10 @@ public class Dino.Plugins.Rtp.VideoWidget : Gtk.Widget, Dino.Plugins.VideoCallWi
     }
 
     private void update_resolution(GLib.Object pad) {
+        if (!got_first_buffer) {
+            return;
+        }
+
         Gst.Caps? caps = ((Gst.Pad)pad).caps;
         if (caps == null) {
             debug("Input: No caps");
@@ -245,11 +250,11 @@ public class Dino.Plugins.Rtp.VideoWidget : Gtk.Widget, Dino.Plugins.VideoCallWi
         });
     }
 
-    public void input_caps_changed(GLib.Object pad, ParamSpec spec) {
+    public void on_input_caps_changed(GLib.Object pad, ParamSpec spec) {
         update_resolution(pad);
     }
 
-    private Gst.PadProbeReturn probe_event(Gst.Pad pad, Gst.PadProbeInfo info) {
+    private Gst.PadProbeReturn on_event(Gst.Pad pad, Gst.PadProbeInfo info) {
         var event = info.get_event();
 
         if (event != null && event.type == Gst.EventType.TAG) {
@@ -313,6 +318,12 @@ public class Dino.Plugins.Rtp.VideoWidget : Gtk.Widget, Dino.Plugins.VideoCallWi
         return Gst.PadProbeReturn.OK;
     }
 
+    private Gst.PadProbeReturn on_first_buffer(Gst.Pad pad, Gst.PadProbeInfo info) {
+        got_first_buffer = true;
+        update_resolution(pad);
+        return Gst.PadProbeReturn.REMOVE;
+    }
+
     public void display_stream(Xmpp.Xep.JingleRtp.Stream? stream, Xmpp.Jid jid) {
         if (sink == null) return;
         detach();
@@ -321,9 +332,13 @@ public class Dino.Plugins.Rtp.VideoWidget : Gtk.Widget, Dino.Plugins.VideoCallWi
         if (connected_stream == null) return;
         plugin.pause();
         pipe.add(sink);
+
         var sink_pad = sink.get_static_pad("sink");
-        sink_pad.notify["caps"].connect(input_caps_changed);
-        sink_pad.add_probe(Gst.PadProbeType.EVENT_DOWNSTREAM, probe_event);
+        sink_pad.notify["caps"].connect(on_input_caps_changed);
+        sink_pad.add_probe(Gst.PadProbeType.EVENT_DOWNSTREAM, on_event);
+        sink_pad.add_probe(Gst.PadProbeType.BUFFER, on_first_buffer);
+        got_first_buffer = false;
+
         if (is_gtk4paintablesink) {
             connected_stream.add_output(sink);
         } else {
@@ -346,9 +361,13 @@ public class Dino.Plugins.Rtp.VideoWidget : Gtk.Widget, Dino.Plugins.VideoCallWi
         plugin.pause();
         pipe.add(sink);
         connected_device_element = connected_device.link_source();
+
         var sink_pad = sink.get_static_pad("sink");
-        sink_pad.notify["caps"].connect(input_caps_changed);
-        sink_pad.add_probe(Gst.PadProbeType.EVENT_DOWNSTREAM, probe_event);
+        sink_pad.notify["caps"].connect(on_input_caps_changed);
+        sink_pad.add_probe(Gst.PadProbeType.EVENT_DOWNSTREAM, on_event);
+        sink_pad.add_probe(Gst.PadProbeType.BUFFER, on_first_buffer);
+        got_first_buffer = false;
+
         if (is_gtk4paintablesink) {
             connected_device_element.link(sink);
         } else {
